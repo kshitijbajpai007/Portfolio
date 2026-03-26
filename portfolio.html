@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio — Product-Minded Developer</title>
+
+  <!-- React and Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
+    rel="stylesheet" />
+
+  <!-- Modular CSS (Supported over file://) -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <div class="grid-bg"></div>
+  <div id="root"></div>
+
+  <!-- Modular React Logic (Consolidated for direct file:/// support) -->
+
+  <!-- 1. Hooks -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    function useInView(threshold = 0.15) {
+      const ref = useRef(null);
+      const [visible, setVisible] = useState(false);
+      useEffect(() => {
+        const obs = new IntersectionObserver(
+          ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
+          { threshold }
+        );
+        if (ref.current) obs.observe(ref.current);
+        return () => obs.disconnect();
+      }, [threshold]);
+      return [ref, visible];
+    }
+  </script>
+
+  <!-- 2. Components: UI Elements -->
+  <script type="text/babel">
+    function TerminalTyping() {
+      const lines = [
+        { type: 'cmd', text: 'whoami' },
+        { type: 'out', text: 'product-minded-developer', highlight: true },
+        { type: 'cmd', text: 'cat skills.json' },
+        { type: 'out', text: '{ "focus": "UX-first engineering", "stack": ["React","Node","Flutter","AI"] }' },
+        { type: 'cmd', text: 'node --eval "console.log(\'available for hire\')"' },
+        { type: 'out', text: 'available for hire ✓', highlight: true },
+      ];
+
+      const [displayed, setDisplayed] = useState([]);
+      const [currentLine, setCurrentLine] = useState(0);
+      const [currentChar, setCurrentChar] = useState(0);
+
+      useEffect(() => {
+        if (currentLine >= lines.length) return;
+        const line = lines[currentLine];
+        if (currentChar < line.text.length) {
+          const t = setTimeout(() => {
+            setCurrentChar(c => c + 1);
+          }, line.type === 'cmd' ? 45 : 18);
+          return () => clearTimeout(t);
+        } else {
+          const t = setTimeout(() => {
+            setDisplayed(d => [...d, line]);
+            setCurrentLine(l => l + 1);
+            setCurrentChar(0);
+          }, line.type === 'cmd' ? 400 : 200);
+          return () => clearTimeout(t);
+        }
+      }, [currentLine, currentChar]);
+
+      const currentLineData = lines[currentLine];
+      const currentText = currentLineData ? currentLineData.text.slice(0, currentChar) : '';
+
+      return (
+        <div className="hero-terminal">
+          <div className="terminal-bar">
+            <div className="terminal-dot" style={{ background: '#ff5f57' }}></div>
+            <div className="terminal-dot" style={{ background: '#febc2e' }}></div>
+            <div className="terminal-dot" style={{ background: '#28c840' }}></div>
+            <span className="terminal-title">~/portfolio — zsh</span>
+          </div>
+          {displayed.map((line, i) => (
+            <div key={i}>
+              {line.type === 'cmd' ? (
+                <div className="terminal-line active">
+                  <span className="terminal-prompt">❯</span>
+                  {line.text}
+                </div>
+              ) : (
+                <div className={`terminal-output${line.highlight ? ' highlight' : ''}`} style={{ marginBottom: '12px' }}>
+                  {line.text}
+                </div>
+              )}
+            </div>
+          ))}
+          {currentLine < lines.length && currentLineData && (
+            <div className="terminal-line active">
+              {currentLineData.type === 'cmd' ? (
+                <><span className="terminal-prompt">❯</span>{currentText}<span className="cursor"></span></>
+              ) : (
+                <div className={`terminal-output${currentLineData.highlight ? ' highlight' : ''}`}>
+                  {currentText}<span className="cursor"></span>
+                </div>
+              )}
+            </div>
+          )}
+          {currentLine >= lines.length && (
+            <div className="terminal-line active">
+              <span className="terminal-prompt">❯</span>
+              <span className="cursor"></span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function PhoneMockup() {
+      const [activeBar, setActiveBar] = useState(4);
+      const bars = [30, 55, 40, 70, 90, 60, 75];
+
+      useEffect(() => {
+        const t = setInterval(() => setActiveBar(a => (a + 1) % bars.length), 1200);
+        return () => clearInterval(t);
+      }, [bars.length]);
+
+      return (
+        <div style={{ position: 'relative' }}>
+          <div className="cubit-phone-glow"></div>
+          <div className="cubit-phone-main">
+            <div className="cubit-phone-screen">
+              <div className="cubit-dynamic-island"></div>
+              <div className="cubit-app-header">
+                <div className="cubit-greeting">Ready to solve?</div>
+                <div className="cubit-name">Alex 👋</div>
+              </div>
+              <div className="cubit-ai-banner">
+                <div className="cubit-ai-label">AI COACH · CUBIT</div>
+                <div className="cubit-ai-text">Your F2L transitions are lagging. Focus on non-rotation lookahead today.</div>
+              </div>
+              <div className="cubit-metrics-grid">
+                <div className="cubit-metric">
+                  <div className="cubit-metric-val accent">8.42s</div>
+                  <div className="cubit-metric-label">BEST SOLVE</div>
+                </div>
+                <div className="cubit-metric">
+                  <div className="cubit-metric-val">10.15s</div>
+                  <div className="cubit-metric-label">AVG OF 5</div>
+                </div>
+                <div className="cubit-metric">
+                  <div className="cubit-metric-val accent">11.24s</div>
+                  <div className="cubit-metric-label">SESSION MEAN</div>
+                </div>
+                <div className="cubit-metric">
+                  <div className="cubit-metric-val">124</div>
+                  <div className="cubit-metric-label">SOLVES TODAY</div>
+                </div>
+              </div>
+              <div style={{ padding: '0 16px', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '48px', marginBottom: '4px' }}>
+                  {bars.map((h, i) => (
+                    <div key={i} style={{
+                      flex: 1,
+                      height: `${h}%`,
+                      borderRadius: '3px 3px 0 0',
+                      background: i === activeBar ? 'var(--accent)' : 'rgba(0,217,255,0.2)',
+                      transition: 'all 0.3s'
+                    }}></div>
+                  ))}
+                </div>
+                <div style={{ fontFamily: 'monospace', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textAlign: 'right' }}>SOLVE TIMES (TREND)</div>
+              </div>
+              <div className="cubit-action-btn">START TIMER →</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  </script>
+
+  <!-- 3. Components: Website Modules -->
+  <script type="text/babel">
+    function TechCard({ icon, name, level, proficiency, delay }) {
+      const [ref, visible] = useInView(0.1);
+      return (
+        <div ref={ref} className={`tech-card reveal reveal-delay-${delay} ${visible ? 'visible animated' : ''}`}>
+          <span className="tech-icon">{icon}</span>
+          <div className="tech-name">{name}</div>
+          <div className="tech-level">{level}</div>
+          <div className="tech-bar-bg">
+            <div className="tech-bar-fill" style={{ width: `${proficiency}%`, transitionDelay: `${delay * 0.1 + 0.3}s` }}></div>
+          </div>
+        </div>
+      );
+    }
+
+    function ContactForm() {
+      const [form, setForm] = useState({ name: '', email: '', type: '', budget: '', message: '' });
+      const [status, setStatus] = useState('idle');
+      const [errors, setErrors] = useState({});
+
+      const validate = () => {
+        const e = {};
+        if (!form.name.trim()) e.name = 'Name required';
+        if (!form.email.match(/^[^@]+@[^@]+\.[^@]+$/)) e.email = 'Valid email required';
+        if (!form.message.trim()) e.message = 'Message required';
+        return e;
+      };
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        const errs = validate();
+        if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+        setStatus('loading');
+        await new Promise(r => setTimeout(r, 1400));
+        setStatus('success');
+        setForm({ name: '', email: '', type: '', budget: '', message: '' });
+        setErrors({});
+      };
+
+      const handle = (k) => (e) => {
+        setForm(f => ({ ...f, [k]: e.target.value }));
+        if (errors[k]) setErrors(er => ({ ...er, [k]: null }));
+      };
+
+      return (
+        <div className="contact-form-wrap">
+          <div style={{ marginBottom: '32px' }}>
+            <div className="section-tag" style={{ marginBottom: '10px' }}>INQUIRE</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: '700', letterSpacing: '-0.03em', color: 'var(--text-primary)' }}>
+              Start a project
+            </div>
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">YOUR NAME *</label>
+                <input className="form-input" placeholder="Alex Chen" value={form.name} onChange={handle('name')} style={errors.name ? { borderColor: '#ff4444' } : {}} />
+                {errors.name && <div style={{ fontSize: '11px', color: '#ff4444', marginTop: '6px', fontFamily: 'var(--font-mono)' }}>{errors.name}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">EMAIL ADDRESS *</label>
+                <input type="email" className="form-input" placeholder="hello@studio.com" value={form.email} onChange={handle('email')} style={errors.email ? { borderColor: '#ff4444' } : {}} />
+                {errors.email && <div style={{ fontSize: '11px', color: '#ff4444', marginTop: '6px', fontFamily: 'var(--font-mono)' }}>{errors.email}</div>}
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">PROJECT TYPE</label>
+                <select className="form-select" value={form.type} onChange={handle('type')}>
+                  <option value="">Select type...</option>
+                  <option value="web">Web App / SaaS</option>
+                  <option value="mobile">Mobile App (iOS/Android)</option>
+                  <option value="landing">High-Conv. Landing Page</option>
+                  <option value="tattoo">Tattoo Studio Website</option>
+                  <option value="ecomm">E-Commerce</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">BUDGET RANGE</label>
+                <select className="form-select" value={form.budget} onChange={handle('budget')}>
+                  <option value="">Select budget...</option>
+                  <option value="">$500 - $2000</option>
+                  <option value="2-5k">$2K – $5K</option>
+                  <option value="5-15k">$5K – $15K</option>
+                  <option value="15-50k">$15K – $50K</option>
+                  <option value="50k+">$50K+</option>
+                  <option value="discuss">Let's discuss</option>
+                </select>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">TELL ME ABOUT YOUR PROJECT *</label>
+              <textarea className="form-textarea" placeholder="Describe your vision, goals, and any specific requirements..." value={form.message} onChange={handle('message')} style={errors.message ? { borderColor: '#ff4444' } : {}} />
+              {errors.message && <div style={{ fontSize: '11px', color: '#ff4444', marginTop: '6px', fontFamily: 'var(--font-mono)' }}>{errors.message}</div>}
+            </div>
+            <button type="submit" className={`form-submit ${status === 'success' ? 'success' : ''}`} disabled={status === 'loading'}>
+              {status === 'idle' && <><span>SEND INQUIRY</span><span>→</span></>}
+              {status === 'loading' && <><span style={{ display: 'inline-block', animation: 'rotate 0.8s linear infinite' }}>⟳</span><span>SENDING...</span></>}
+              {status === 'success' && <><span>✓</span><span>SENT SUCCESSFULLY</span></>}
+            </button>
+            <p className="form-note">{status === 'success' ? '// Response within 24 hours. Check your inbox.' : '// Encrypted. No spam. Response within 24h.'}</p>
+          </form>
+        </div>
+      );
+    }
+
+    function Nav() {
+      const [scrolled, setScrolled] = useState(false);
+      useEffect(() => {
+        const fn = () => setScrolled(window.scrollY > 40);
+        window.addEventListener('scroll', fn);
+        return () => window.removeEventListener('scroll', fn);
+      }, []);
+      return (
+        <nav style={scrolled ? { boxShadow: '0 8px 40px rgba(0,0,0,0.4)' } : {}}>
+          <a href="#" className="nav-logo">{'<dev />'}</a>
+          <ul className="nav-links">
+            {['Work', 'Cubit', 'Services', 'Stack', 'Contact'].map(l => (
+              <li key={l}><a href={`#${l.toLowerCase()}`}>{l}</a></li>
+            ))}
+          </ul>
+          <a href="#contact" className="nav-cta">ENQUIRE</a>
+          <button className="nav-mobile-menu" aria-label="menu">
+            <span></span><span></span><span></span>
+          </button>
+        </nav>
+      );
+    }
+  </script>
+
+  <!-- 4. Main App Logic -->
+  <script type="text/babel">
+    function App() {
+      useEffect(() => {
+        const obs = new IntersectionObserver(
+          (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+          { threshold: 0.1 }
+        );
+        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+        return () => obs.disconnect();
+      }, []);
+
+      useEffect(() => {
+        const obs = new IntersectionObserver(
+          (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('animated'); }),
+          { threshold: 0.3 }
+        );
+        document.querySelectorAll('.tech-bar-fill').forEach(el => obs.observe(el));
+        return () => obs.disconnect();
+      }, []);
+
+      const techStack = [
+        { icon: '⚛️', name: 'React / Next.js', level: 'EXPERT', proficiency: 80 },
+        { icon: '🟩', name: 'Node.js', level: 'EXPERT', proficiency: 90 },
+        { icon: '✖️', name: 'XCode', level: 'ADVANCED', proficiency: 85 },
+        { icon: '⚡', name: 'Supabase', level: 'ADVANCED', proficiency: 88 },
+        { icon: '🎨', name: 'Tailwind CSS', level: 'EXPERT', proficiency: 96 },
+        { icon: '🤖', name: 'AI / LLMs', level: 'ADVANCED', proficiency: 82 },
+        { icon: '🔷', name: 'TypeScript', level: 'EXPERT', proficiency: 91 },
+        { icon: '🐘', name: 'PostgreSQL', level: 'ADVANCED', proficiency: 84 },
+        { icon: '🚀', name: 'Vite / Turbo', level: 'EXPERT', proficiency: 90 },
+        { icon: '🎭', name: 'Framer Motion', level: 'ADVANCED', proficiency: 86 },
+        { icon: '☁️', name: 'AWS / Vercel', level: 'INTERMEDIATE', proficiency: 78 },
+        { icon: '🔐', name: 'Auth & Security', level: 'ADVANCED', proficiency: 83 },
+      ];
+
+      return (
+        <>
+          <Nav />
+          <section className="hero" id="hero">
+            <div className="hero-glow"></div>
+            <div className="hero-content">
+              <div className="hero-badge animate-fade-up" style={{ animationDelay: '0.1s' }}>
+                <span className="hero-badge-dot"></span>
+                AVAILABLE FOR NEW PROJECTS
+              </div>
+              <TerminalTyping />
+              <h1 className="hero-h1 animate-fade-up" style={{ animationDelay: '0.4s' }}>
+                I Build Products<br /><span>Users Love.</span>
+              </h1>
+              <p className="hero-sub animate-fade-up" style={{ animationDelay: '0.55s' }}>
+                Full-stack engineer obsessed with product thinking, pixel-perfect interfaces, and shipping things that actually move the needle.
+              </p>
+              <div className="hero-ctas animate-fade-up" style={{ animationDelay: '0.7s' }}>
+                <a href="#work" className="btn-primary">VIEW WORK</a>
+                <a href="#contact" className="btn-secondary">START A PROJECT</a>
+              </div>
+            </div>
+          </section>
+
+          <div className="stats-bar">
+            <div className="container">
+              <div className="stats-inner">
+                {[
+                  { num: '3', unit: '+', label: 'YEARS SHIPPING' },
+                  { num: '40', unit: '+', label: 'PROJECTS DELIVERED' },
+                  { num: '98', unit: '%', label: 'CLIENT SATISFACTION' },
+                  { num: '12', unit: 'x', label: 'AVG CONV. LIFT' },
+                ].map(s => (
+                  <div key={s.label} className="stat-item">
+                    <div className="stat-num">{s.num}<span>{s.unit}</span></div>
+                    <div className="stat-label">{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <section className="bento-section" id="work">
+            <div className="container">
+              <div className="section-header reveal">
+                <div className="section-tag">SELECTED WORK</div>
+                <h2 className="section-h2">Built with intention,<br />shipped with precision.</h2>
+                <p className="section-sub">A curated selection of products, tools, and experiments that define my craft.</p>
+              </div>
+              <div className="bento-grid">
+                <div className="bento-card featured reveal" style={{ position: 'relative', overflow: 'visible' }}>
+                  <div className="card-tag"><span className="card-tag-dot"></span>FEATURED PROJECT · iOS + AI</div>
+                  <h3 className="card-h3" style={{ fontSize: '32px' }}>CubIt</h3>
+                  <p className="card-desc" style={{ maxWidth: '360px' }}>High-performance, minimalist iOS application for speedcubers. Precision timing meets AI-driven coaching to break through plateaus.</p>
+                  <div className="card-tags">
+                    <span className="tag-pill accent">SwiftUI</span>
+                    <span className="tag-pill accent">AI Coach</span>
+                    <span className="tag-pill">iOS</span>
+                    <span className="tag-pill">WCA Scrambles</span>
+                    <span className="tag-pill">Analytic Engine</span>
+                  </div>
+                  <a href="#cubit" className="card-link">EXPLORE CASE STUDY <span className="card-arrow">↗</span></a>
+                  <div className="cubit-visual">
+                    <div className="phone-mockup" style={{ width: '140px', height: '280px', borderRadius: '28px' }}>
+                      <div className="phone-screen">
+                        <div className="phone-notch"></div>
+                        <div style={{ padding: '24px 12px 12px' }}>
+                          <div className="phone-metric">
+                            <div className="phone-metric-label">AI COACH</div>
+                            <div className="phone-metric-val" style={{ fontSize: '11px', lineHeight: '1.4' }}>Try a 15 min session of F2L lookup.</div>
+                          </div>
+                          <div className="phone-metric">
+                            <div className="phone-metric-label">BEST SOLVE</div>
+                            <div className="phone-metric-val">8.42s</div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: '40px', marginTop: '8px' }}>
+                            {[40, 60, 45, 80, 95, 70, 85].map((h, i) => (
+                              <div key={i} className={`phone-bar ${i === 4 ? 'active' : ''}`} style={{ height: `${h}%` }}></div>
+                            ))}
+                          </div>
+                          <div className="phone-bar-btn">START TIMER →</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bento-card tall reveal reveal-delay-1" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div className="card-tag"><span className="card-tag-dot"></span>CLIENT · WEB ECOSYSTEM</div>
+                  <h3 className="card-h3">Black Meridian</h3>
+                  <p className="card-desc">Premium tattoo ecosystem featuring a high-fidelity React frontend and automated booking engine. Precision engineering meets artisanal design.</p>
+                  <div style={{ flex: 1, background: 'var(--bg-elevated)', borderRadius: '12px', overflow: 'hidden', marginBottom: '20px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '0' }}>
+                    {['Portfolio Engine', 'Interaction Model', 'Booking Ecosystem', 'Studio Config'].map((f, i) => (
+                      <div key={f} style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)' }}>{f}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: i < 3 ? 'var(--accent)' : 'rgba(255,255,255,0.15)' }}></div>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: i < 3 ? 'var(--accent)' : 'var(--text-muted)' }}>{i < 3 ? 'LIVE' : 'WIP'}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="card-tags">
+                    <span className="tag-pill">React 18</span>
+                    <span className="tag-pill">Node.js</span>
+                    <span className="tag-pill accent">Vite</span>
+                    <span className="tag-pill">Vanilla CSS</span>
+                  </div>
+                </div>
+
+                <div className="bento-card wide reveal reveal-delay-2">
+                  <div className="card-tag"><span className="card-tag-dot"></span>PRODUCT · SAAS</div>
+                  <h3 className="card-h3">AnalyticOS</h3>
+                  <p className="card-desc">Real-time analytics dashboard for DTC brands. Custom charting engine, cohort analysis, zero-latency queries.</p>
+                  <div className="card-tags">
+                    <span className="tag-pill accent">React</span><span className="tag-pill">Supabase</span><span className="tag-pill">D3.js</span><span className="tag-pill">Node</span>
+                  </div>
+                  <a href="#contact" className="card-link">VIEW CASE STUDY <span className="card-arrow">↗</span></a>
+                </div>
+
+                <div className="bento-card wide reveal reveal-delay-3">
+                  <div className="card-tag"><span className="card-tag-dot"></span>PRODUCT · AI RESEARCH</div>
+                  <h3 className="card-h3">Problem Intelligence</h3>
+                  <p className="card-desc">AI-powered market research tool that surfaces real pain patterns from Reddit and forums. Not ideas — problems people already pay to fix.</p>
+                  <div className="card-tags">
+                    <span className="tag-pill accent">React 18</span><span className="tag-pill">Claude 3.5</span><span className="tag-pill">Agentic AI</span><span className="tag-pill">Vite</span>
+                  </div>
+                  <a href="#contact" className="card-link">VIEW CASE STUDY <span className="card-arrow">↗</span></a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="cubit-section" id="cubit">
+            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px 80px' }}>
+              <div className="section-header reveal" style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 80px' }}>
+                <div className="section-tag" style={{ justifyContent: 'center' }}>FEATURED CASE STUDY</div>
+                <h2 className="section-h2">CubIt — Precision<br />Speedcubing</h2>
+                <p className="section-sub" style={{ margin: '0 auto' }}>Developed for the 2026 Swift Student Challenge, CubIt transitions the cubing experience from a simple stopwatch to a comprehensive training ecosystem.</p>
+              </div>
+            </div>
+            <div className="cubit-inner">
+              <div className="cubit-features">
+                <div className="reveal"><div className="section-tag">CORE FEATURES</div></div>
+                {[
+                  { icon: '⏱️', title: 'Precision Timer', desc: 'Gesture-based timer with inspection countdowns and millisecond accuracy for competition prep.' },
+                  { icon: '🧠', title: 'AI Coach', desc: 'Custom logic engine that analyzes solve patterns to provide actionable tips on F2L, OLL, and PLL.' },
+                  { icon: '🎲', title: 'Scramble Generator', desc: 'WCA-compliant random scramble sequences for 3x3 and other specialty puzzles.' },
+                  { icon: '📈', title: 'Performance Analytics', desc: 'Visualized data showing Ao5, Ao12, and progress trends to help you break through plateaus.' },
+                ].map((f, i) => (
+                  <div key={f.title} className={`feature-item reveal reveal-delay-${i + 1}`}>
+                    <div className="feature-icon">{f.icon}</div>
+                    <div className="feature-body"><h4>{f.title}</h4><p>{f.desc}</p></div>
+                  </div>
+                ))}
+              </div>
+              <div className="cubit-phone-stage reveal reveal-delay-2"><PhoneMockup /></div>
+            </div>
+          </section>
+
+          <section className="solutions-section" id="services">
+            <div className="container">
+              <div className="section-header reveal">
+                <div className="section-tag">CLIENT WORK</div>
+                <h2 className="section-h2">Digital Transformation<br />for Creatives.</h2>
+              </div>
+              <div className="solutions-grid">
+                {[
+                  { num: '01', icon: '🎨', title: 'Tattoo & Body Art Studios', desc: 'Elevating artisanal craft through high-fidelity engineering.', points: ['Luxury digital portfolio engines', 'Automated GDPR booking funnels', 'Studio-specific CRM architecture'], featured: true },
+                  { num: '02', icon: '🚀', title: 'SaaS & Tech Startups', desc: 'Full-stack product development from zero to launch.', points: ['MVP → production in 6 weeks', 'Auth, billing, analytics built-in'], featured: false },
+                  { num: '03', icon: '🛍️', title: 'Niche E-Commerce Brands', desc: 'High-conversion storefronts for brands with a story.', points: ['Headless commerce builds', 'Conversion rate optimization'], featured: false },
+                ].map(s => (
+                  <div key={s.num} className={`solution-card reveal ${s.featured ? 'featured-solution' : ''}`}>
+                    <div className="solution-num">// {s.num}</div>
+                    <div className="solution-icon-wrap">{s.icon}</div>
+                    <h3 className="solution-h3">{s.title}</h3>
+                    <p className="solution-p">{s.desc}</p>
+                    <ul className="solution-points">
+                      {s.points.map(p => <li key={p} className={s.featured ? 'active' : ''}>{p}</li>)}
+                    </ul>
+                    <a href="#contact" className="card-link" style={{ marginTop: '24px' }}>GET A QUOTE <span className="card-arrow">↗</span></a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="tech-section" id="stack">
+            <div className="container">
+              <div className="section-header reveal">
+                <div className="section-tag">TECHNICAL EXPERTISE</div>
+                <h2 className="section-h2">Built on a modern,<br />battle-tested stack.</h2>
+              </div>
+              <div className="tech-grid">
+                {techStack.map((t, i) => <TechCard key={t.name} {...t} delay={(i % 4) + 1} />)}
+              </div>
+            </div>
+          </section>
+
+          <section className="process-section">
+            <div className="container">
+              <div className="section-header reveal" style={{ textAlign: 'center', maxWidth: '560px', margin: '0 auto 64px' }}>
+                <div className="section-tag" style={{ justifyContent: 'center' }}>HOW I WORK</div>
+                <h2 className="section-h2">From idea to<br />production.</h2>
+              </div>
+              <div className="process-steps">
+                {[
+                  { num: '01', title: 'Discovery', desc: 'Deep dive into your users, business goals, and landscape.' },
+                  { num: '02', title: 'Architecture', desc: 'System design, technical stack selection, and UX wireframes.' },
+                  { num: '03', title: 'Build & Iterate', desc: 'Weekly deliverables. You see real progress every Friday.' },
+                  { num: '04', title: 'Launch & Scale', desc: 'CI/CD pipelines, monitoring, and growth optionality.' },
+                ].map((s, i) => (
+                  <div key={s.num} className={`process-step reveal reveal-delay-${i + 1}`}>
+                    <div className="step-num">// {s.num}</div><div className="step-h4">{s.title}</div><div className="step-p">{s.desc}</div>
+                    {i < 3 && <div className="step-connector">→</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="contact-section" id="contact">
+            <div className="container">
+              <div className="contact-inner">
+                <div className="contact-info reveal">
+                  <h2>Let's build<br />something <span>great.</span></h2>
+                  <div className="contact-details">
+                    {[
+                      { icon: '📧', label: 'EMAIL', val: 'rickrolledrum@gmail.com' },
+                      { icon: '☎️', label: 'CONTACT', val: '+91 9569957007' },
+                      { icon: '📍', label: 'TIMEZONE', val: 'GMT+5:30 · Remote' },
+                      { icon: '⚡', label: 'AVAILABILITY', val: 'Open to projects from April 2026' },
+                    ].map(d => (
+                      <div key={d.label} className="contact-detail-item">
+                        <div className="contact-detail-icon">{d.icon}</div>
+                        <div><div className="contact-detail-label">{d.label}</div><div className="contact-detail-val">{d.val}</div></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="reveal reveal-delay-2"><ContactForm /></div>
+              </div>
+            </div>
+          </section>
+
+          <footer>
+            <div className="container">
+              <div className="footer-inner">
+                <div className="footer-logo">{'<dev />'}</div>
+                <div className="footer-copy">// Crafted with precision · {new Date().getFullYear()}</div>
+                <div className="footer-links">
+                  <a href="#work">Work</a><a href="#services">Services</a><a href="#contact">Contact</a>
+                </div>
+              </div>
+            </div>
+          </footer>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+
+</html>
