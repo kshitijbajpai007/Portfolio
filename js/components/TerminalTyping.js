@@ -3,7 +3,7 @@ const { useState, useEffect } = React;
 function TerminalTyping() {
   const lines = [
     { type: 'cmd', text: 'whoami' },
-    { type: 'out', text: 'product-minded-developer', highlight: true },
+    { type: 'out', text: 'Kshitij Bajpai, a product-minded-developer', highlight: true },
     { type: 'cmd', text: 'cat skills.json' },
     { type: 'out', text: '{ "focus": "UX-first engineering", "stack": ["React","Node","Flutter","AI"] }' },
     { type: 'cmd', text: 'node --eval "console.log(\'available for hire\')"' },
