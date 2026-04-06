@@ -660,6 +660,7 @@ section {
   background: linear-gradient(135deg, rgba(0, 217, 255, 0.04), transparent);
   opacity: 0;
   transition: opacity 0.35s;
+  pointer-events: none;
 }
 
 .bento-card:hover {
@@ -774,6 +775,8 @@ section {
   letter-spacing: 0.06em;
   transition: gap 0.2s;
   margin-top: 20px;
+  position: relative;
+  z-index: 10;
 }
 
 .card-link:hover {
